@@ -4,24 +4,25 @@ import os
 import json
 import hashlib
 
-# ───── (1) 로그아웃 안내 페이지 처리 ─────
-if "logged_out" in st.session_state and st.session_state["logged_out"]:
-    st.success("로그아웃 되었습니다.")
-    if st.button("로그인 화면으로 돌아가기"):
-        del st.session_state["logged_out"]
-        st.experimental_rerun()
-    st.stop()
+# --- 1. 상태 분기 세팅 ---
+if "page" not in st.session_state:
+    st.session_state.page = "login"
 
-# ───── (2) 안전 로그아웃 함수 ─────
+# --- 2. 로그아웃 함수 (rerun 없이 상태만 변경) ---
 def logout():
     for k in ["username", "password", "user_hash", "temp_user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
-    st.session_state["logged_out"] = True
-    st.experimental_rerun()
-    return
+    st.session_state.page = "logout"
 
-# ───── (3) 인증 상태 확인(없으면 로그인/회원가입만 노출 후 st.stop()) ─────
+# --- 3. 로그아웃 안내 페이지 ---
+if st.session_state.page == "logout":
+    st.success("로그아웃 되었습니다.")
+    if st.button("로그인 화면으로 돌아가기"):
+        st.session_state.page = "login"
+    st.stop()
+
+# --- 4. 로그인/회원가입 화면 ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -41,9 +42,14 @@ def load_hint(user_hash):
             return f.read()
     return None
 
-if "username" not in st.session_state or "password" not in st.session_state or "user_hash" not in st.session_state:
+if (
+    "username" not in st.session_state
+    or "password" not in st.session_state
+    or "user_hash" not in st.session_state
+) or st.session_state.page == "login":
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
+    st.title("나만의 감정 일기장")
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
         password_input = st.text_input("비밀번호를 입력해주세요:", type="password")
@@ -64,19 +70,31 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 st.session_state.username = name_input.strip()
                 st.session_state.password = password_input.strip()
                 st.session_state.user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
+                st.session_state.page = "main"
             else:
                 st.warning("이름과 비밀번호를 모두 입력해주세요.")
-    if st.session_state.temp_user_hash and not os.path.exists(os.path.join("diary_data", st.session_state.temp_user_hash)):
+    if (
+        st.session_state.temp_user_hash
+        and not os.path.exists(
+            os.path.join("diary_data", st.session_state.temp_user_hash)
+        )
+    ):
         with st.form("hint_form"):
             hint_input = st.text_input("비밀번호 힌트(선택):")
             submitted_hint = st.form_submit_button("힌트 저장")
             if submitted_hint:
-                os.makedirs(os.path.join("diary_data", st.session_state.temp_user_hash), exist_ok=True)
+                os.makedirs(
+                    os.path.join("diary_data", st.session_state.temp_user_hash),
+                    exist_ok=True,
+                )
                 save_hint(st.session_state.temp_user_hash, hint_input)
                 st.success("힌트가 저장되었습니다. 이제 이름/비밀번호를 다시 입력해 로그인하세요.")
     st.stop()
 
-# ───── (4) 로그아웃 버튼 및 메인앱 ─────
+# --- 5. 일기장 본 기능 ---
+USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
+os.makedirs(USER_FOLDER, exist_ok=True)
+
 with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
@@ -84,9 +102,6 @@ with st.sidebar:
         st.stop()
 
 st.title(f"📔 {st.session_state.username}의 일기장 🔐")
-
-USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
-os.makedirs(USER_FOLDER, exist_ok=True)
 
 EMOTION_CATEGORIES = {
     "긍정적인 감정": {
