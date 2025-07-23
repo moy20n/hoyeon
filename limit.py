@@ -96,11 +96,14 @@ button[kind="secondary"] {{
 if st.session_state.get("show_popup", False):
     el = st.session_state.get("selected_element", {})
     with st.container():
+        col1, col2 = st.columns([5, 1])
+        with col2:
+            if st.button("❌", key="popup_close_inline"):
+                st.session_state["show_popup"] = False
+        with col1:
         st.markdown(f"""
             <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-    <div style='text-align:right;'>
-        <span style='font-size:18px; font-weight:bold;'>❌</span>
-    </div>
+    
     <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
     <ul style='list-style:none; padding:0; font-size:16px;'>
                     <li><strong>기호:</strong> {el.get('symbol')}</li>
