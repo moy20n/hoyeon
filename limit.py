@@ -22,25 +22,9 @@ def logout():
             del st.session_state[k]
     st.session_state.page = "logout"
 
-# --- 4. 로그인/회원가입 화면 (파랑 꾸미기+2회 실패 힌트 노출) ---
+# --- 4. 로그인/회원가입 화면 (힌트 전부 제거, 파랑 안내만) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
-
-def get_hint_path(user_hash):
-    return os.path.join("diary_data", user_hash, ".hint")
-
-def save_hint(user_hash, hint_text):
-    path = get_hint_path(user_hash)
-    if hint_text.strip():
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(hint_text.strip())
-
-def load_hint(user_hash):
-    path = get_hint_path(user_hash)
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read()
-    return None
 
 if (
     "username" not in st.session_state
@@ -70,14 +54,12 @@ if (
     </div>
     """, unsafe_allow_html=True)
 
-    # 앱 타이틀(변경X)
-    st.title("𝓓𝓲𝓪𝓻𝔂")
+    st.title("𝓓𝓲𝓪𝓻𝔂⋰˚★")
 
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
         password_input = st.text_input("비밀번호를 입력해주세요:", type="password")
         submitted = st.form_submit_button("입력 완료")
-        login_success = False
 
         if name_input.strip() and password_input.strip():
             user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
@@ -98,7 +80,6 @@ if (
                         st.session_state.user_hash = expected_hash
                         st.session_state.page = "main"
                         st.session_state.pw_fail_count = 0
-                        login_success = True
                     else:
                         st.session_state.pw_fail_count += 1
                         st.warning("비밀번호가 틀렸습니다.")
@@ -109,37 +90,8 @@ if (
                     st.session_state.user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
                     st.session_state.page = "main"
                     st.session_state.pw_fail_count = 0
-                    login_success = True
             else:
                 st.warning("이름과 비밀번호를 모두 입력해주세요.")
-
-    # 2번 이상 틀릴 때 힌트 자동 노출
-    if st.session_state.pw_fail_count >= 2:
-        hint = None
-        if st.session_state.temp_user_hash:
-            hint = load_hint(st.session_state.temp_user_hash)
-        if hint:
-            st.info(f"🔑 비밀번호 힌트: {hint}")
-        else:
-            st.info("등록된 힌트가 없습니다.")
-
-    # 신규회원 힌트 입력
-    if (
-        st.session_state.temp_user_hash
-        and not os.path.exists(
-            os.path.join("diary_data", st.session_state.temp_user_hash)
-        )
-    ):
-        with st.form("hint_form"):
-            hint_input = st.text_input("비밀번호 힌트(선택):")
-            submitted_hint = st.form_submit_button("힌트 저장")
-            if submitted_hint:
-                os.makedirs(
-                    os.path.join("diary_data", st.session_state.temp_user_hash),
-                    exist_ok=True,
-                )
-                save_hint(st.session_state.temp_user_hash, hint_input)
-                st.success("힌트가 저장되었습니다. 이제 이름/비밀번호를 다시 입력해 로그인하세요.")
     st.stop()
 
 # --- 5. 일기장 본 기능 ---
