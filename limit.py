@@ -75,7 +75,14 @@ for y in y_levels:
     cols = st.columns(18)
     for _, el in row.iterrows():
         with cols[int(el["x"])]:
-            if st.button(f"{el['symbol']}", key=f"btn_{el['atomic number']}"):
+            st.markdown(f"""
+                <div style='background-color:{el['color']}; padding:8px; border-radius:6px; text-align:center;'>
+                    <button style='all:unset; cursor:pointer; width:100%; font-weight:bold; color:black;' onclick="window.location.href='#{el['symbol']}'">
+                        {el['symbol']}
+                    </button>
+                </div>
+                """, unsafe_allow_html=True)
+            if st.button("", key=f"btn_{el['atomic number']}"):
                 st.session_state["selected_element"] = el.to_dict()
             st.markdown(f"""
                 <style>
