@@ -15,14 +15,14 @@ if st.session_state.page == "logout":
         st.session_state.page = "login"
     st.stop()
 
-# --- 3. 로그아웃 함수 (rerun/st.stop 없이 상태만 변경) ---
+# --- 3. 로그아웃 함수 ---
 def logout():
     for k in ["username", "password", "user_hash", "temp_user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
     st.session_state.page = "logout"
 
-# --- 4. 로그인/회원가입 화면 (파랑파랑 디자인!) ---
+# --- 4. 로그인/회원가입 화면 (타이틀 유지, 위쪽만 파랑파랑) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -50,27 +50,26 @@ if (
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
 
-    # 🟦💙📝 파랑파랑하게 상단 꾸미기
+    # 🟦 파랑 그라데이션 안내영역(타이틀은 아래 그대로!)
     st.markdown("""
     <div style='
         background: linear-gradient(120deg, #b3d8ff 0%, #84a9ff 100%);
-        border-radius: 20px;
-        padding: 2.5rem 1.2rem 1.7rem 1.2rem;
-        margin-bottom: 2.5rem;
+        border-radius: 18px;
+        padding: 1.3rem 1rem 1.1rem 1rem;
+        margin-bottom: 1.2rem;
         box-shadow: 0 2px 24px #1976d230;
         text-align: center;
     '>
-        <div style='font-size: 2.9rem; margin-bottom: 0.5rem;'>🌊 💙 📝</div>
-        <div style='font-size: 2.1rem; font-weight: 900; color:#176be6; margin-bottom:0.5rem; letter-spacing:-1px'>
-            파랑파랑 감정 일기장
+        <span style='font-size:2.1rem; margin-bottom:0.4rem;'>🌊💙📝</span>
+        <div style='font-size: 1.09rem; color:#114485; margin-top:0.4rem;'>
+            <b>기분과 하루를 파란 하늘처럼 기록해 보세요!</b>
         </div>
-        <div style='font-size: 1.14rem; color:#1b3047; margin-bottom:0.4rem;'>
-            오늘의 감정과 하루를<br>
-            <span style='color:#2278fd; font-weight:600;'>파랗게</span> 기록해보세요!<br>
-            <span style='font-size:1.4em;'>🖊️✨</span>
-        </div>
+        <div style='font-size: 1.2em; margin-top:0.2em;'>오늘도 좋은 하루 보내세요! 🫧</div>
     </div>
     """, unsafe_allow_html=True)
+
+    # ✅ 앱 타이틀은 바꾸지 않고 그대로!
+    st.title("나만의 감정 일기장")
 
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
