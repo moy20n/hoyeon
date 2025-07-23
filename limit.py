@@ -8,21 +8,21 @@ import hashlib
 if "page" not in st.session_state:
     st.session_state.page = "login"
 
-# --- 2. 로그아웃 함수 (rerun 없이 상태만 변경) ---
+# --- 2. 로그아웃 안내 페이지 (항상 최상단 분기!) ---
+if st.session_state.page == "logout":
+    st.success("로그아웃 되었습니다. 🌊📝")
+    if st.button("로그인 화면으로 돌아가기"):
+        st.session_state.page = "login"
+    st.stop()
+
+# --- 3. 로그아웃 함수 (rerun/st.stop 없이 상태만 변경) ---
 def logout():
     for k in ["username", "password", "user_hash", "temp_user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
     st.session_state.page = "logout"
 
-# --- 3. 로그아웃 안내 페이지 ---
-if st.session_state.page == "logout":
-    st.success("로그아웃 되었습니다.")
-    if st.button("로그인 화면으로 돌아가기"):
-        st.session_state.page = "login"
-    st.stop()
-
-# --- 4. 로그인/회원가입 화면 ---
+# --- 4. 로그인/회원가입 화면 (파랑파랑 디자인!) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -49,7 +49,29 @@ if (
 ) or st.session_state.page == "login":
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
-    st.title("나만의 감정 일기장")
+
+    # 🟦💙📝 파랑파랑하게 상단 꾸미기
+    st.markdown("""
+    <div style='
+        background: linear-gradient(120deg, #b3d8ff 0%, #84a9ff 100%);
+        border-radius: 20px;
+        padding: 2.5rem 1.2rem 1.7rem 1.2rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 2px 24px #1976d230;
+        text-align: center;
+    '>
+        <div style='font-size: 2.9rem; margin-bottom: 0.5rem;'>🌊 💙 📝</div>
+        <div style='font-size: 2.1rem; font-weight: 900; color:#176be6; margin-bottom:0.5rem; letter-spacing:-1px'>
+            파랑파랑 감정 일기장
+        </div>
+        <div style='font-size: 1.14rem; color:#1b3047; margin-bottom:0.4rem;'>
+            오늘의 감정과 하루를<br>
+            <span style='color:#2278fd; font-weight:600;'>파랗게</span> 기록해보세요!<br>
+            <span style='font-size:1.4em;'>🖊️✨</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
         password_input = st.text_input("비밀번호를 입력해주세요:", type="password")
@@ -63,7 +85,7 @@ if (
         if st.session_state.temp_user_hash:
             hint = load_hint(st.session_state.temp_user_hash)
         if hint:
-            st.info(f"비밀번호 힌트: {hint}")
+            st.info(f"🔑 비밀번호 힌트: {hint}")
         submitted = st.form_submit_button("입력 완료")
         if submitted:
             if name_input.strip() and password_input.strip():
@@ -99,7 +121,6 @@ with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
         logout()
-        st.stop()
 
 st.title(f"📔 {st.session_state.username}의 일기장 🔐")
 
