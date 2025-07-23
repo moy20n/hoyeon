@@ -4,6 +4,11 @@ import os
 import json
 import hashlib
 
+# ─── 로그아웃 즉시 앱 중단 (rerun 에러 방지) ───────────
+if "logout" in st.session_state:
+    del st.session_state["logout"]
+    st.stop()
+
 # ─── 비밀번호 해시 함수 ─────────────────────
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -30,6 +35,7 @@ def logout():
     for k in ["username", "password", "user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
+    st.session_state["logout"] = True
     st.experimental_rerun()
 
 # ─── 사용자 인증 및 폴더 관리 ──────
