@@ -1,4 +1,12 @@
 import streamlit as st
+
+if "logout" in st.session_state and st.session_state["logout"]:
+    # 로그아웃 직후, 세션 모두 정리 및 코드 중단
+    for k in list(st.session_state.keys()):
+        del st.session_state[k]
+    st.stop()
+
+import streamlit as 
 from datetime import date
 import os
 import json
