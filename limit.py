@@ -71,11 +71,28 @@ for y in y_levels:
     cols = st.columns(18, gap="small")
     for _, el in row.iterrows():
         with cols[int(el["x"])]:
-            btn = st.button(el["symbol"], key=f"btn_{el['atomic number']}")
+            button_key = f"btn_{el['atomic number']}"
+            btn = st.button(el["symbol"], key=button_key)
+            st.markdown(f"""
+            <style>
+            div[data-testid="stButton"] button[data-testid="{button_key}"] {{
+                background-color: {el['color']} !important;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
             st.markdown(f"""
 <style>
-button[kind="secondary"] {{
-    background-color: {el['color']} !important;
+button[kind="secondary"] {
+    color: black !important;
+    font-weight: bold;
+    border-radius: 6px;
+    width: 100% !important;
+    height: 60px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+} !important;
     color: black !important;
     font-weight: bold;
     border-radius: 6px;
@@ -97,7 +114,7 @@ if st.session_state.get("show_popup", False):
     el = st.session_state.get("selected_element", {})
     with st.container():
         st.markdown(f"""
-            <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+            <div style='position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
         """, unsafe_allow_html=True)
 
         close_col, content_col = st.columns([1, 5])
