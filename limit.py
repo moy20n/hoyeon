@@ -106,28 +106,27 @@ for y in y_levels:
 # 팝업 표시
 if st.session_state.get("show_popup", False):
     el = st.session_state.get("selected_element", {})
-    with st.container():
-        st.markdown(f"""
-            <div style='position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-        """, unsafe_allow_html=True)
+    st.markdown(f"""
+        <div style='position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#ffffff; padding:25px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.25); border: 2px solid #ccc; z-index:1000; width: 350px; text-align:left; font-size:16px; position:relative;'>
+            <div style='position:absolute; top:10px; right:10px;'>
+                <form action='' method='post'>
+                    <button type='submit' name='close_popup' style='font-size:18px; border:none; background:none; cursor:pointer;'>❌</button>
+                </form>
+            </div>
+            <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+            <ul style='list-style:none; padding:0; font-size:16px;'>
+                <li><strong>기호:</strong> {el.get('symbol')}</li>
+                <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
+                <li><strong>족:</strong> {el.get('Group')}</li>
+                <li><strong>주기:</strong> {el.get('Period')}</li>
+                <li><strong>설명:</strong> 이 원소는 {el.get('Group')}족 {el.get('Period')}주기에 위치한 원소입니다.</li>
+            </ul>
+        </div>
+    """, unsafe_allow_html=True)
 
-        close_col, content_col = st.columns([1, 5])
-        with close_col:
-            if st.button("❌", key="popup_close_final"):
-                st.session_state["show_popup"] = False
-        with content_col:
-            st.markdown(f"""
-                <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-                <ul style='list-style:none; padding:0; font-size:16px;'>
-    <li><strong>기호:</strong> {el.get('symbol')}</li>
-    <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
-    <li><strong>족:</strong> {el.get('Group')}</li>
-    <li><strong>주기:</strong> {el.get('Period')}</li>
-    <li><strong>설명:</strong> 이 원소는 {el.get('Group')}족 {el.get('Period')}주기에 위치한 원소입니다.</li>
-</ul>
-            """, unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
+    # 닫기 요청 처리
+    if "close_popup" in st.experimental_get_query_params():
+        st.session_state["show_popup"] = False
         
-        st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
+        
         
