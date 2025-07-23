@@ -75,35 +75,29 @@ for y in y_levels:
             btn = st.button(el["symbol"], key=button_key)
             st.markdown(f"""
             <style>
+            div[data-testid="stButton"] > button[data-testid="{button_key}"] {{
+                background-color: {el['color']} !important;
+                color: black !important;
+                font-weight: bold;
+                border-radius: 6px;
+                width: 100% !important;
+                height: 60px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 !important;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+            st.markdown(f"""
+            <style>
             div[data-testid="stButton"] button[data-testid="{button_key}"] {{
                 background-color: {el['color']} !important;
             }}
             </style>
             """, unsafe_allow_html=True)
             st.markdown(f"""
-<style>
-button[kind="secondary"] {
-    color: black !important;
-    font-weight: bold;
-    border-radius: 6px;
-    width: 100% !important;
-    height: 60px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 !important;
-} !important;
-    color: black !important;
-    font-weight: bold;
-    border-radius: 6px;
-    width: 100% !important;
-    height: 60px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 !important;
-}}
-</style>
+
 """, unsafe_allow_html=True)
             if btn:
                 st.session_state["selected_element"] = el.to_dict()
