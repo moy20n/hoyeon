@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 
 # -------------------------------
-# 전체 주기율표 데이터 정의 (대표적인 118개 원소 좌표화용 위치 포함)
+# 전체 주기율표 데이터 정의 (요약된 형태)
 # -------------------------------
-data = [
+data =[
     ("H", 1, 1, 1), ("He", 2, 18, 1),
     ("Li", 3, 1, 2), ("Be", 4, 2, 2), ("B", 5, 13, 2), ("C", 6, 14, 2), ("N", 7, 15, 2), ("O", 8, 16, 2), ("F", 9, 17, 2), ("Ne", 10, 18, 2),
     ("Na", 11, 1, 3), ("Mg", 12, 2, 3), ("Al", 13, 13, 3), ("Si", 14, 14, 3), ("P", 15, 15, 3), ("S", 16, 16, 3), ("Cl", 17, 17, 3), ("Ar", 18, 18, 3),
@@ -31,33 +31,31 @@ data = [
 columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
-# 좌표 및 색상 지정
+# 좌표 계산 및 색상 분류
 df["x"] = df["Group"] - 1
-max_period = df["Period"].max()
 df["y"] = df["Period"] - 1
 
-# 색상 매핑 예시
-metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]
-nonmetals = ["H", "C", "N", "O", "F", "P", "S", "Cl", "Se", "Br", "I", "At", "Ts"]
-noblegases = ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]
+metals = ["Li", "Be", "Na", "Mg", "Al"]  # 예시
+nonmetals = ["H", "C", "N", "O", "F"]
+noblegases = ["He", "Ne"]
 
 def assign_color(symbol):
     if symbol in metals:
-        return "#FFD700"  # 금속 - 금색
+        return "#FFD700"  # 금속
     elif symbol in nonmetals:
-        return "#90EE90"  # 비금속 - 연두색
+        return "#90EE90"  # 비금속
     elif symbol in noblegases:
-        return "#87CEFA"  # 비활성기체 - 하늘색
+        return "#87CEFA"  # 비활성기체
     else:
-        return "#D3D3D3"  # 기타 - 회색
+        return "#D3D3D3"  # 기타
 
 df["color"] = df["symbol"].apply(assign_color)
 
-# Streamlit 페이지 설정
-st.set_page_config(page_title="ChemPlay - 주기율표 배치", layout="wide")
-st.title("🧪 ChemPlay: 전체 주기율표 배치")
+# 페이지 구성
+st.set_page_config(page_title="ChemPlay - 주기율표", layout="wide")
+st.title("🧪 ChemPlay: 전체 주기율표")
 
-# 범례 출력
+# 색상 범례
 with st.expander("🧾 색상 범례 보기"):
     st.markdown("""
     <div style='display:flex; gap:1rem;'>
@@ -68,60 +66,41 @@ with st.expander("🧾 색상 범례 보기"):
     </div>
     """, unsafe_allow_html=True)
 
-# UI 출력
+# 버튼 배치
 y_levels = sorted(df["y"].unique())
 for y in y_levels:
     row = df[df["y"] == y].sort_values("x")
     cols = st.columns(18)
     for _, el in row.iterrows():
         with cols[int(el["x"])]:
-            if st.button(f"{el['symbol']}", key=f"btn_{el['atomic number']}", help=el['symbol']):
-    st.session_state["selected_element"] = el.to_dict()
-            if st.button("", key=f"btn_{el['atomic number']}"):
-                st.session_state["selected_element"] = el.to_dict()
+            btn = st.button(el["symbol"], key=f"btn_{el['atomic number']}")
             st.markdown(f"""
                 <style>
-                div[data-testid="element-container"] > div:has(button[data-testid="baseButton-module"])[data-testid="stButton"] {{
+                button[data-testid="baseButton-module"][data-testid="stButton"]#{el['atomic number']} {{
                     background-color: {el['color']} !important;
-                    border-radius: 6px;
-                    padding: 10px;
-                    text-align: center;
                     color: black;
                     font-weight: bold;
+                    border-radius: 6px;
                 }}
                 </style>
             """, unsafe_allow_html=True)
+            if btn:
+                st.session_state["selected_element"] = el.to_dict()
+                st.session_state["show_popup"] = True
 
-# 클릭한 원소 정보
-if "selected_element" in st.session_state:
-    if "show_popup" not in st.session_state:
-        st.session_state["show_popup"] = True
-
-    if st.session_state["show_popup"]:
-        el = st.session_state["selected_element"]
-        close = st.button("❌ 닫기", key="close_popup")
-        if close:
-            st.session_state["show_popup"] = False
-        else:
-            st.markdown(f"""
-            <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-                <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-                <ul style='list-style:none; padding:0; font-size:16px;'>
-                    <li><strong>기호:</strong> {el['symbol']}</li>
-                    <li><strong>원자번호:</strong> {el['atomic number']}</li>
-                    <li><strong>족:</strong> {el['Group']}</li>
-                    <li><strong>주기:</strong> {el['Period']}</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-    </div>
-    """, unsafe_allow_html=True)
-    el = st.session_state["selected_element"]
+# 팝업 표시
+if st.session_state.get("show_popup", False):
+    el = st.session_state.get("selected_element", {})
     st.markdown(f"""
-    ---
-    ### 🔍 선택한 원소 정보
-    - 기호: {el['symbol']}
-    - 원자번호: {el['atomic number']}
-    - 족: {el['Group']}
-    - 주기: {el['Period']}
-    """)
+        <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+            <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+            <ul style='list-style:none; padding:0; font-size:16px;'>
+                <li><strong>기호:</strong> {el.get('symbol')}</li>
+                <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
+                <li><strong>족:</strong> {el.get('Group')}</li>
+                <li><strong>주기:</strong> {el.get('Period')}</li>
+            </ul>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("❌ 닫기", key="close_popup"):
+        st.session_state["show_popup"] = False
