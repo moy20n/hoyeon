@@ -119,11 +119,12 @@ if st.session_state.get("show_popup", False):
             st.markdown(f"""
                 <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
                 <ul style='list-style:none; padding:0; font-size:16px;'>
-                    <li><strong>기호:</strong> {el.get('symbol')}</li>
-                    <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
-                    <li><strong>족:</strong> {el.get('Group')}</li>
-                    <li><strong>주기:</strong> {el.get('Period')}</li>
-                </ul>
+    <li><strong>기호:</strong> {el.get('symbol')}</li>
+    <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
+    <li><strong>족:</strong> {el.get('Group')}</li>
+    <li><strong>주기:</strong> {el.get('Period')}</li>
+    <li><strong>설명:</strong> 이 원소는 {el.get('Group')}족 {el.get('Period')}주기에 위치한 원소입니다.</li>
+</ul>
             """, unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
