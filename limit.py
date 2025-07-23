@@ -34,7 +34,7 @@ df = pd.DataFrame(data, columns=columns)
 # 좌표 및 색상 지정
 df["x"] = df["Group"] - 1
 max_period = df["Period"].max()
-df["y"] = df["Period"].apply(lambda p: max_period - p)
+df["y"] = df["Period"] - 1
 
 # 색상 매핑 예시
 metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]
