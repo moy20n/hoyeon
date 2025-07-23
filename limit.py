@@ -26,7 +26,7 @@ def logout():
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# --- 5. 로그인/회원가입 화면 (파랑 안내, 힌트 없음) ---
+# --- 5. 로그인/회원가입 화면 ---
 if (
     "username" not in st.session_state
     or "password" not in st.session_state
@@ -56,7 +56,7 @@ if (
     </div>
     """, unsafe_allow_html=True)
 
-    st.title("𝓓𝓲𝓪𝓻𝔂☁")
+    st.title("☁𝓓𝓲𝓪𝓻𝔂☁")
 
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
@@ -148,6 +148,33 @@ if (
         "🌩️ 천둥번개": "stormy"
     }
 
+    EMOJI_EMOTION = {
+        "happy": "😊",
+        "loving": "😍",
+        "excited": "🤩",
+        "calm": "😌",
+        "sad": "😢",
+        "angry": "😡",
+        "crying": "😭",
+        "frustrated": "😖",
+        "worried": "😟",
+        "anxious": "😨",
+        "neutral": "😐",
+        "thoughtful": "🤔",
+        "speechless": "😶",
+        "tired": "😴",
+        "exhausted": "😫"
+    }
+
+    EMOJI_WEATHER = {
+        "sunny": "☀️",
+        "cloudy": "⛅",
+        "rainy": "🌧️",
+        "snowy": "🌨️",
+        "foggy": "🌫️",
+        "stormy": "🌩️"
+    }
+
     def get_diary_path(date_str):
         return os.path.join(USER_FOLDER, f"{date_str}.json")
 
@@ -235,16 +262,28 @@ if (
 
     elif menu == "📅 지난 일기 보기":
         st.header("저장된 일기 보기")
+
         diary_files = sorted(os.listdir(USER_FOLDER))
         diary_dates = [f.replace(".json", "") for f in diary_files]
-        
+
         if diary_dates:
-            selected_date = st.selectbox("날짜 선택", diary_dates)
-            entry = load_diary(selected_date)
-            if entry:
-                st.markdown(f"### 📅 {selected_date}")
-                st.markdown(f"**감정:** {entry['emotion']}  |  **날씨:** {entry['weather']}")
-                st.text_area("내용", entry["text"], height=300, disabled=True)
+            st.info(f"파란 날짜만 일기가 있습니다. 달력에서 골라보세요! 💙")
+            selected_date = st.date_input(
+                "날짜 선택",
+                value=date.fromisoformat(diary_dates[-1]),  # 최근 저장된 날짜로 기본값
+                min_value=date.fromisoformat(min(diary_dates)),
+                max_value=date.fromisoformat(max(diary_dates))
+            )
+            date_str = selected_date.isoformat()
+            if date_str in diary_dates:
+                entry = load_diary(date_str)
+                if entry:
+                    emotion_icon = EMOJI_EMOTION.get(entry['emotion'], "")
+                    weather_icon = EMOJI_WEATHER.get(entry['weather'], "")
+                    st.markdown(f"### {date_str}  {weather_icon} {emotion_icon}")
+                    st.text_area("내용", entry["text"], height=300, disabled=True)
+            else:
+                st.info("이 날짜에는 저장된 일기가 없습니다.")
         else:
             st.info("아직 저장된 일기가 없습니다.")
 
@@ -256,7 +295,9 @@ if (
             results = search_diaries(keyword)
             if results:
                 for date_str, entry in results:
-                    st.markdown(f"### 📅 {date_str} | 감정: {entry['emotion']} | 날씨: {entry['weather']}")
+                    emotion_icon = EMOJI_EMOTION.get(entry['emotion'], "")
+                    weather_icon = EMOJI_WEATHER.get(entry['weather'], "")
+                    st.markdown(f"### 📅 {date_str} | 감정: {emotion_icon} | 날씨: {weather_icon}")
                     st.markdown(entry["text"])
                     st.markdown("---")
             else:
