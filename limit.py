@@ -94,16 +94,26 @@ for y in y_levels:
 
 # 클릭한 원소 정보
 if "selected_element" in st.session_state:
-    el = st.session_state["selected_element"]
-    st.markdown(f"""
-    <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-        <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-        <ul style='list-style:none; padding:0; font-size:16px;'>
-            <li><strong>기호:</strong> {el['symbol']}</li>
-            <li><strong>원자번호:</strong> {el['atomic number']}</li>
-            <li><strong>족:</strong> {el['Group']}</li>
-            <li><strong>주기:</strong> {el['Period']}</li>
-        </ul>
+    if "show_popup" not in st.session_state:
+        st.session_state["show_popup"] = True
+
+    if st.session_state["show_popup"]:
+        el = st.session_state["selected_element"]
+        close = st.button("❌ 닫기", key="close_popup")
+        if close:
+            st.session_state["show_popup"] = False
+        else:
+            st.markdown(f"""
+            <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+                <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+                <ul style='list-style:none; padding:0; font-size:16px;'>
+                    <li><strong>기호:</strong> {el['symbol']}</li>
+                    <li><strong>원자번호:</strong> {el['atomic number']}</li>
+                    <li><strong>족:</strong> {el['Group']}</li>
+                    <li><strong>주기:</strong> {el['Period']}</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
     </div>
     """, unsafe_allow_html=True)
     el = st.session_state["selected_element"]
