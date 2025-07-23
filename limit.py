@@ -1,132 +1,108 @@
 import streamlit as st
-import pandas as pd
+from datetime import date
+import os
+import json
 
-# -------------------------------
-# 전체 주기율표 데이터 정의 (요약된 형태)
-# -------------------------------
-data = [
-    ("H", 1, 1, 1), ("He", 2, 18, 1),
-    ("Li", 3, 1, 2), ("Be", 4, 2, 2), ("B", 5, 13, 2), ("C", 6, 14, 2), ("N", 7, 15, 2), ("O", 8, 16, 2), ("F", 9, 17, 2), ("Ne", 10, 18, 2),
-    ("Na", 11, 1, 3), ("Mg", 12, 2, 3), ("Al", 13, 13, 3), ("Si", 14, 14, 3), ("P", 15, 15, 3), ("S", 16, 16, 3), ("Cl", 17, 17, 3), ("Ar", 18, 18, 3),
-    ("K", 19, 1, 4), ("Ca", 20, 2, 4), ("Sc", 21, 3, 4), ("Ti", 22, 4, 4), ("V", 23, 5, 4), ("Cr", 24, 6, 4), ("Mn", 25, 7, 4),
-    ("Fe", 26, 8, 4), ("Co", 27, 9, 4), ("Ni", 28, 10, 4), ("Cu", 29, 11, 4), ("Zn", 30, 12, 4),
-    ("Ga", 31, 13, 4), ("Ge", 32, 14, 4), ("As", 33, 15, 4), ("Se", 34, 16, 4), ("Br", 35, 17, 4), ("Kr", 36, 18, 4),
-    ("Rb", 37, 1, 5), ("Sr", 38, 2, 5), ("Y", 39, 3, 5), ("Zr", 40, 4, 5), ("Nb", 41, 5, 5), ("Mo", 42, 6, 5), ("Tc", 43, 7, 5),
-    ("Ru", 44, 8, 5), ("Rh", 45, 9, 5), ("Pd", 46, 10, 5), ("Ag", 47, 11, 5), ("Cd", 48, 12, 5),
-    ("In", 49, 13, 5), ("Sn", 50, 14, 5), ("Sb", 51, 15, 5), ("Te", 52, 16, 5), ("I", 53, 17, 5), ("Xe", 54, 18, 5),
-    ("Cs", 55, 1, 6), ("Ba", 56, 2, 6), ("La", 57, 3, 9), ("Hf", 72, 4, 6), ("Ta", 73, 5, 6), ("W", 74, 6, 6), ("Re", 75, 7, 6),
-    ("Os", 76, 8, 6), ("Ir", 77, 9, 6), ("Pt", 78, 10, 6), ("Au", 79, 11, 6), ("Hg", 80, 12, 6),
-    ("Tl", 81, 13, 6), ("Pb", 82, 14, 6), ("Bi", 83, 15, 6), ("Po", 84, 16, 6), ("At", 85, 17, 6), ("Rn", 86, 18, 6),
-    ("Fr", 87, 1, 7), ("Ra", 88, 2, 7), ("Ac", 89, 3, 10), ("Rf", 104, 4, 7), ("Db", 105, 5, 7), ("Sg", 106, 6, 7), ("Bh", 107, 7, 7),
-    ("Hs", 108, 8, 7), ("Mt", 109, 9, 7), ("Ds", 110, 10, 7), ("Rg", 111, 11, 7), ("Cn", 112, 12, 7),
-    ("Nh", 113, 13, 7), ("Fl", 114, 14, 7), ("Mc", 115, 15, 7), ("Lv", 116, 16, 7), ("Ts", 117, 17, 7), ("Og", 118, 18, 7),
-    ("Ce", 58, 4, 9), ("Pr", 59, 5, 9), ("Nd", 60, 6, 9), ("Pm", 61, 7, 9), ("Sm", 62, 8, 9), ("Eu", 63, 9, 9),
-    ("Gd", 64, 10, 9), ("Tb", 65, 11, 9), ("Dy", 66, 12, 9), ("Ho", 67, 13, 9), ("Er", 68, 14, 9), ("Tm", 69, 15, 9), ("Yb", 70, 16, 9), ("Lu", 71, 17, 9),
-    ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
-    ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
-]
+# 저장 폴더
+DIARY_FOLDER = "diary_data"
+os.makedirs(DIARY_FOLDER, exist_ok=True)
 
-columns = ["symbol", "atomic number", "Group", "Period"]
-df = pd.DataFrame(data, columns=columns)
+# 감정 이모지
+EMOTIONS = {
+    "😊 행복": "happy",
+    "😢 슬픔": "sad",
+    "😡 화남": "angry",
+    "😨 불안": "anxious",
+    "😐 무덤덤": "neutral"
+}
 
-# 좌표 계산 및 색상 분류
-df["x"] = df["Group"] - 1
-df["y"] = df["Period"] - 1
+# 날씨 이모지
+WEATHERS = {
+    "☀️ 맑음": "sunny",
+    "⛅ 구름": "cloudy",
+    "🌧️ 비": "rainy",
+    "🌨️ 눈": "snowy",
+    "🌫️ 안개": "foggy",
+    "🌩️ 천둥번개": "stormy"
+}
 
-metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]  # 예시
-nonmetals = ["H", "C", "N", "O", "F", "P", "S", "Se", "Cl", "Br", "I"]
-noblegases = ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]
+# 파일 경로
+def get_diary_path(date_str):
+    return os.path.join(DIARY_FOLDER, f"{date_str}.json")
 
-def assign_color(symbol):
-    if symbol in metals:
-        return "#FFD700"  # 금속
-    elif symbol in nonmetals:
-        return "#90EE90"  # 비금속
-    elif symbol in noblegases:
-        return "#87CEFA"  # 비활성기체
+# 저장
+def save_diary(date_str, text, emotion, weather):
+    entry = {"text": text, "emotion": emotion, "weather": weather}
+    with open(get_diary_path(date_str), "w", encoding="utf-8") as f:
+        json.dump(entry, f, ensure_ascii=False)
+
+# 불러오기
+def load_diary(date_str):
+    path = get_diary_path(date_str)
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+# 검색
+def search_diaries(keyword):
+    results = []
+    for filename in os.listdir(DIARY_FOLDER):
+        if filename.endswith(".json"):
+            with open(os.path.join(DIARY_FOLDER, filename), "r", encoding="utf-8") as f:
+                entry = json.load(f)
+                if keyword in entry["text"]:
+                    results.append((filename.replace(".json", ""), entry))
+    return results
+
+
+# ──────────────────────────────────────────────────────────────
+st.title("📔 나만의 감정 일기장")
+
+menu = st.sidebar.selectbox("메뉴 선택", ["✍️ 일기 쓰기", "🔍 일기 검색", "📅 지난 일기 보기"])
+
+# ──────────────────────── 일기 쓰기
+if menu == "✍️ 일기 쓰기":
+    st.header("오늘의 일기 쓰기")
+    selected_date = st.date_input("날짜 선택", date.today())
+    date_str = selected_date.isoformat()
+
+    emotion = st.selectbox("오늘의 감정은?", list(EMOTIONS.keys()))
+    weather = st.selectbox("오늘의 날씨는?", list(WEATHERS.keys()))
+    text = st.text_area("일기 내용 입력", height=300)
+
+    if st.button("💾 저장하기"):
+        save_diary(date_str, text, EMOTIONS[emotion], WEATHERS[weather])
+        st.success("일기가 저장되었습니다.")
+
+# ──────────────────────── 일기 보기
+elif menu == "📅 지난 일기 보기":
+    st.header("저장된 일기 보기")
+    diary_files = sorted(os.listdir(DIARY_FOLDER))
+    diary_dates = [f.replace(".json", "") for f in diary_files]
+    
+    if diary_dates:
+        selected_date = st.selectbox("날짜 선택", diary_dates)
+        entry = load_diary(selected_date)
+        if entry:
+            st.markdown(f"### 📅 {selected_date}")
+            st.markdown(f"**감정:** {entry['emotion']}")
+            st.markdown(f"**날씨:** {entry['weather']}")
+            st.text_area("내용", entry["text"], height=300, disabled=True)
     else:
-        return "#D3D3D3"  # 기타
+        st.info("아직 저장된 일기가 없습니다.")
 
-df["color"] = df["symbol"].apply(assign_color)
+# ──────────────────────── 검색
+elif menu == "🔍 일기 검색":
+    st.header("🔍 키워드로 일기 검색")
+    keyword = st.text_input("검색할 키워드 입력")
 
-# 페이지 구성
-st.set_page_config(page_title="ChemPlay - 주기율표", layout="wide")
-st.title("🧪 ChemPlay: 전체 주기율표")
-
-# 색상 범례
-with st.expander("🧾 색상 범례 보기"):
-    st.markdown("""
-    <div style='display:flex; gap:1rem;'>
-        <div style='background-color:#FFD700; padding:5px 10px; border-radius:5px;'>금속</div>
-        <div style='background-color:#90EE90; padding:5px 10px; border-radius:5px;'>비금속</div>
-        <div style='background-color:#87CEFA; padding:5px 10px; border-radius:5px;'>비활성기체</div>
-        <div style='background-color:#D3D3D3; padding:5px 10px; border-radius:5px;'>기타</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# 버튼 배치
-y_levels = sorted(df["y"].unique())
-for y in y_levels:
-    row = df[df["y"] == y].sort_values("x")
-    cols = st.columns(18, gap="small")
-    for _, el in row.iterrows():
-        with cols[int(el["x"])]:
-            button_key = f"btn_{el['atomic number']}"
-            btn = st.button(el["symbol"], key=button_key)
-            st.markdown(f"""
-            <style>
-            div[data-testid="stButton"] > button[data-testid="{button_key}"] {{
-                background-color: {el['color']} !important;
-                color: black !important;
-                font-weight: bold;
-                border-radius: 6px;
-                width: 100% !important;
-                height: 60px !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 !important;
-            }}
-            </style>
-            """, unsafe_allow_html=True)
-            st.markdown(f"""
-            <style>
-            div[data-testid="stButton"] button[data-testid="{button_key}"] {{
-                background-color: {el['color']} !important;
-            }}
-            </style>
-            """, unsafe_allow_html=True)
-            st.markdown(f"""
-
-""", unsafe_allow_html=True)
-            if btn:
-                st.session_state["selected_element"] = el.to_dict()
-                st.session_state["show_popup"] = True
-
-# 팝업 표시
-if st.session_state.get("show_popup", False):
-    el = st.session_state.get("selected_element", {})
-    st.markdown(f"""
-        <div style='position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#ffffff; padding:25px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.25); border: 2px solid #ccc; z-index:1000; width: 350px; text-align:left; font-size:16px; position:relative;'>
-            <div style='position:absolute; top:10px; right:10px;'>
-                <form action='' method='post'>
-                    <button type='submit' name='close_popup' style='font-size:18px; border:none; background:none; cursor:pointer;'>❌</button>
-                </form>
-            </div>
-            <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-            <ul style='list-style:none; padding:0; font-size:16px;'>
-                <li><strong>기호:</strong> {el.get('symbol')}</li>
-                <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
-                <li><strong>족:</strong> {el.get('Group')}</li>
-                <li><strong>주기:</strong> {el.get('Period')}</li>
-                <li><strong>설명:</strong> 이 원소는 {el.get('Group')}족 {el.get('Period')}주기에 위치한 원소입니다.</li>
-            </ul>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # 닫기 요청 처리
-    if "close_popup" in st.experimental_get_query_params():
-        st.session_state["show_popup"] = False
-        
-        
-        
+    if st.button("검색"):
+        results = search_diaries(keyword)
+        if results:
+            for date_str, entry in results:
+                st.markdown(f"### 📅 {date_str} | 감정: {entry['emotion']} | 날씨: {entry['weather']}")
+                st.markdown(entry["text"])
+                st.markdown("---")
+        else:
+            st.warning("검색 결과가 없습니다.")
