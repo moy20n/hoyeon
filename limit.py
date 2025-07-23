@@ -69,7 +69,7 @@ if (
     """, unsafe_allow_html=True)
 
     # ✅ 앱 타이틀은 바꾸지 않고 그대로!
-    st.title("나만의 감정 일기장")
+    st.title("𝓓𝓲𝓪𝓻𝔂")
 
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
