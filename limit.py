@@ -60,12 +60,31 @@ if "selected_element" in st.session_state:
     st.markdown("""
     ---
     ### 🔍 선택한 원소 정보
-    """)
+    <div style='font-size:28px; font-weight:bold; text-align:center;'>
+        <div style='display:inline-block; line-height:0.9;'>
+            <sup style='font-size:16px;'>{A}</sup><br>
+            <span style='font-size:48px;'>{symbol}</span><br>
+            <sub style='font-size:16px;'>{Z}</sub>
+        </div>
+    </div>
+    <br>
+    """.format(
+        A=el.get("Atomic Mass", "A"),
+        Z=int(el["atomic number"]),
+        symbol=el["symbol"]
+    ), unsafe_allow_html=True)
+
     st.write({
-        "기호": el["symbol"],
         "이름": el["name"],
         "원자번호": int(el["atomic number"]),
         "족": int(el["Group"]),
         "주기": int(el["Period"]),
-        "종류": el["type"]
+        "종류": el["type"],
+        "원자 질량": el.get("Atomic Mass", "정보 없음"),
+        "전자 배치": el.get("Electron Configuration", "정보 없음"),
+        "상온 상태": el.get("Phase at STP", "정보 없음"),
+        "전기 음성도": el.get("Electronegativity", "정보 없음"),
+        "녹는점 (K)": el.get("Melting Point", "정보 없음"),
+        "끓는점 (K)": el.get("Boiling Point", "정보 없음"),
+        "설명": el.get("Summary", "요약 정보 없음")
     })
