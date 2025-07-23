@@ -27,6 +27,7 @@ data =[
     ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
     ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
 ]
+
 columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
@@ -34,9 +35,9 @@ df = pd.DataFrame(data, columns=columns)
 df["x"] = df["Group"] - 1
 df["y"] = df["Period"] - 1
 
-metals = ["Li", "Be", "Na", "Mg", "Al"]  # 예시
-nonmetals = ["H", "C", "N", "O", "F"]
-noblegases = ["He", "Ne"]
+metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]  # 예시
+nonmetals = ["H", "C", "N", "O", "F", "P", "S", "Se", "Cl", "Br", "I"]
+noblegases = ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]
 
 def assign_color(symbol):
     if symbol in metals:
@@ -99,6 +100,7 @@ if st.session_state.get("show_popup", False):
     with st.container():
         st.markdown(f"""
             <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+    <div style='text-align:right;'><button onclick="window.location.reload()" style='background:none; border:none; font-size:20px; cursor:pointer;'>❌</button></div>
                 <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
                 <ul style='list-style:none; padding:0; font-size:16px;'>
                     <li><strong>기호:</strong> {el.get('symbol')}</li>
