@@ -22,7 +22,7 @@ def logout():
             del st.session_state[k]
     st.session_state.page = "logout"
 
-# --- 4. 로그인/회원가입 화면 (타이틀 유지, 위쪽만 파랑파랑) ---
+# --- 4. 로그인/회원가입 화면 (파랑 꾸미기+2회 실패 힌트 노출) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -49,8 +49,10 @@ if (
 ) or st.session_state.page == "login":
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
+    if "pw_fail_count" not in st.session_state:
+        st.session_state.pw_fail_count = 0
 
-    # 🟦 파랑 그라데이션 안내영역(타이틀은 아래 그대로!)
+    # 파랑 안내 영역
     st.markdown("""
     <div style='
         background: linear-gradient(120deg, #b3d8ff 0%, #84a9ff 100%);
@@ -68,32 +70,60 @@ if (
     </div>
     """, unsafe_allow_html=True)
 
-    # ✅ 앱 타이틀은 바꾸지 않고 그대로!
+    # 앱 타이틀(변경X)
     st.title("𝓓𝓲𝓪𝓻𝔂")
 
     with st.form("login_form"):
         name_input = st.text_input("당신의 이름을 입력해주세요:")
         password_input = st.text_input("비밀번호를 입력해주세요:", type="password")
+        submitted = st.form_submit_button("입력 완료")
+        login_success = False
+
         if name_input.strip() and password_input.strip():
             user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
             st.session_state.temp_user_hash = user_hash
         else:
             user_hash = ""
             st.session_state.temp_user_hash = ""
+
+        if submitted:
+            if name_input.strip() and password_input.strip():
+                user_dir = os.path.join("diary_data", f"{name_input.strip()}_{hash_password(password_input.strip())}")
+                # 기존 유저: 비밀번호 체크
+                if os.path.exists(user_dir):
+                    expected_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
+                    if expected_hash == st.session_state.temp_user_hash:
+                        st.session_state.username = name_input.strip()
+                        st.session_state.password = password_input.strip()
+                        st.session_state.user_hash = expected_hash
+                        st.session_state.page = "main"
+                        st.session_state.pw_fail_count = 0
+                        login_success = True
+                    else:
+                        st.session_state.pw_fail_count += 1
+                        st.warning("비밀번호가 틀렸습니다.")
+                else:
+                    # 신규 회원가입: 바로 진입
+                    st.session_state.username = name_input.strip()
+                    st.session_state.password = password_input.strip()
+                    st.session_state.user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
+                    st.session_state.page = "main"
+                    st.session_state.pw_fail_count = 0
+                    login_success = True
+            else:
+                st.warning("이름과 비밀번호를 모두 입력해주세요.")
+
+    # 2번 이상 틀릴 때 힌트 자동 노출
+    if st.session_state.pw_fail_count >= 2:
         hint = None
         if st.session_state.temp_user_hash:
             hint = load_hint(st.session_state.temp_user_hash)
         if hint:
             st.info(f"🔑 비밀번호 힌트: {hint}")
-        submitted = st.form_submit_button("입력 완료")
-        if submitted:
-            if name_input.strip() and password_input.strip():
-                st.session_state.username = name_input.strip()
-                st.session_state.password = password_input.strip()
-                st.session_state.user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
-                st.session_state.page = "main"
-            else:
-                st.warning("이름과 비밀번호를 모두 입력해주세요.")
+        else:
+            st.info("등록된 힌트가 없습니다.")
+
+    # 신규회원 힌트 입력
     if (
         st.session_state.temp_user_hash
         and not os.path.exists(
