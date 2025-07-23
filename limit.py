@@ -4,7 +4,7 @@ import pandas as pd
 # -------------------------------
 # 전체 주기율표 데이터 정의 (요약된 형태)
 # -------------------------------
-data =[
+data = [
     ("H", 1, 1, 1), ("He", 2, 18, 1),
     ("Li", 3, 1, 2), ("Be", 4, 2, 2), ("B", 5, 13, 2), ("C", 6, 14, 2), ("N", 7, 15, 2), ("O", 8, 16, 2), ("F", 9, 17, 2), ("Ne", 10, 18, 2),
     ("Na", 11, 1, 3), ("Mg", 12, 2, 3), ("Al", 13, 13, 3), ("Si", 14, 14, 3), ("P", 15, 15, 3), ("S", 16, 16, 3), ("Cl", 17, 17, 3), ("Ar", 18, 18, 3),
@@ -26,9 +26,7 @@ data =[
     # 악티늄족
     ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
     ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
-]
-
-columns = ["symbol", "atomic number", "Group", "Period"]
+]columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
 # 좌표 계산 및 색상 분류
@@ -70,20 +68,26 @@ with st.expander("🧾 색상 범례 보기"):
 y_levels = sorted(df["y"].unique())
 for y in y_levels:
     row = df[df["y"] == y].sort_values("x")
-    cols = st.columns(18)
+    cols = st.columns(18, gap="small")
     for _, el in row.iterrows():
         with cols[int(el["x"])]:
             btn = st.button(el["symbol"], key=f"btn_{el['atomic number']}")
             st.markdown(f"""
-                <style>
-                button[data-testid="baseButton-module"][data-testid="stButton"]#{el['atomic number']} {{
-                    background-color: {el['color']} !important;
-                    color: black;
-                    font-weight: bold;
-                    border-radius: 6px;
-                }}
-                </style>
-            """, unsafe_allow_html=True)
+<style>
+button[kind="secondary"] {{
+    background-color: {el['color']} !important;
+    color: black !important;
+    font-weight: bold;
+    border-radius: 6px;
+    width: 100% !important;
+    height: 60px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+}}
+</style>
+""", unsafe_allow_html=True)
             if btn:
                 st.session_state["selected_element"] = el.to_dict()
                 st.session_state["show_popup"] = True
@@ -91,16 +95,18 @@ for y in y_levels:
 # 팝업 표시
 if st.session_state.get("show_popup", False):
     el = st.session_state.get("selected_element", {})
-    st.markdown(f"""
-        <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-            <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-            <ul style='list-style:none; padding:0; font-size:16px;'>
-                <li><strong>기호:</strong> {el.get('symbol')}</li>
-                <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
-                <li><strong>족:</strong> {el.get('Group')}</li>
-                <li><strong>주기:</strong> {el.get('Period')}</li>
-            </ul>
-        </div>
-    """, unsafe_allow_html=True)
-    if st.button("❌ 닫기", key="close_popup"):
-        st.session_state["show_popup"] = False
+    with st.container():
+        st.markdown(f"""
+            <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+                <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+                <ul style='list-style:none; padding:0; font-size:16px;'>
+                    <li><strong>기호:</strong> {el.get('symbol')}</li>
+                    <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
+                    <li><strong>족:</strong> {el.get('Group')}</li>
+                    <li><strong>주기:</strong> {el.get('Period')}</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+        st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
+        if st.button("❌ 팝업 닫기", key="close_popup"):
+            st.session_state["show_popup"] = False
