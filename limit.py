@@ -2,114 +2,102 @@ import streamlit as st
 import pandas as pd
 
 # -------------------------------
-# 전체 118개 주기율표 데이터 직접 정의
+# 전체 주기율표 데이터 정의 (대표적인 118개 원소 좌표화용 위치 포함)
 # -------------------------------
 data = [
-    ("H", "Hydrogen", 1, 1, 1, 1.008, "1s1", "Gas", 2.20, 14.01, 20.28, "Hydrogen is the lightest element.", "Nonmetal"),
-    ("He", "Helium", 2, 18, 1, 4.0026, "1s2", "Gas", None, 0.95, 4.22, "Helium is a noble gas.", "Noble Gas"),
-    ("Li", "Lithium", 3, 1, 2, 6.94, "[He] 2s1", "Solid", 0.98, 453.69, 1603, "Lithium is an alkali metal.", "Alkali Metal"),
-    ("Be", "Beryllium", 4, 2, 2, 9.0122, "[He] 2s2", "Solid", 1.57, 1560, 2742, "Beryllium is a hard gray metal.", "Alkaline Earth Metal"),
-    ("B", "Boron", 5, 13, 2, 10.81, "[He] 2s2 2p1", "Solid", 2.04, 2349, 4200, "Boron is a metalloid.", "Metalloid"),
-    ("C", "Carbon", 6, 14, 2, 12.011, "[He] 2s2 2p2", "Solid", 2.55, 3823, 4300, "Carbon is the basis of life.", "Nonmetal"),
-    ("N", "Nitrogen", 7, 15, 2, 14.007, "[He] 2s2 2p3", "Gas", 3.04, 63.15, 77.36, "Nitrogen makes up most of the atmosphere.", "Nonmetal"),
-    ("O", "Oxygen", 8, 16, 2, 15.999, "[He] 2s2 2p4", "Gas", 3.44, 54.36, 90.20, "Oxygen supports combustion.", "Nonmetal"),
-    ("F", "Fluorine", 9, 17, 2, 18.998, "[He] 2s2 2p5", "Gas", 3.98, 53.53, 85.03, "Fluorine is highly reactive.", "Halogen"),
-    ("Ne", "Neon", 10, 18, 2, 20.180, "[He] 2s2 2p6", "Gas", None, 24.56, 27.07, "Neon is used in lighting.", "Noble Gas"),
-    ("Na", "Sodium", 11, 1, 3, 22.990, "[Ne] 3s1", "Solid", 0.93, 370.87, 1156, "Sodium is a soft metal.", "Alkali Metal"),
-    ("Mg", "Magnesium", 12, 2, 3, 24.305, "[Ne] 3s2", "Solid", 1.31, 923, 1363, "Magnesium is a lightweight metal.", "Alkaline Earth Metal"),
-    ("Al", "Aluminum", 13, 13, 3, 26.982, "[Ne] 3s2 3p1", "Solid", 1.61, 933.47, 2792, "Aluminum is a lightweight, silvery-white metal.", "Post-Transition Metal"),
-    ("Si", "Silicon", 14, 14, 3, 28.085, "[Ne] 3s2 3p2", "Solid", 1.90, 1687, 3538, "Silicon is used in electronics.", "Metalloid"),
-    ("P", "Phosphorus", 15, 15, 3, 30.974, "[Ne] 3s2 3p3", "Solid", 2.19, 317.3, 553.7, "Phosphorus is highly reactive.", "Nonmetal"),
-    ("S", "Sulfur", 16, 16, 3, 32.06, "[Ne] 3s2 3p4", "Solid", 2.58, 388.36, 717.87, "Sulfur is yellow and found in minerals.", "Nonmetal"),
-    ("Cl", "Chlorine", 17, 17, 3, 35.45, "[Ne] 3s2 3p5", "Gas", 3.16, 171.6, 239.11, "Chlorine is used for disinfection.", "Halogen"),
-    ("Ar", "Argon", 18, 18, 3, 39.948, "[Ne] 3s2 3p6", "Gas", None, 83.81, 87.30, "Argon is a noble gas.", "Noble Gas")
-    # 전체 118개 원소 중 일부 예시로 18개만 나열됨. 전체 데이터는 필요 시 이어서 추가 가능.
+    ("H", 1, 1, 1), ("He", 2, 18, 1),
+    ("Li", 3, 1, 2), ("Be", 4, 2, 2), ("B", 5, 13, 2), ("C", 6, 14, 2), ("N", 7, 15, 2), ("O", 8, 16, 2), ("F", 9, 17, 2), ("Ne", 10, 18, 2),
+    ("Na", 11, 1, 3), ("Mg", 12, 2, 3), ("Al", 13, 13, 3), ("Si", 14, 14, 3), ("P", 15, 15, 3), ("S", 16, 16, 3), ("Cl", 17, 17, 3), ("Ar", 18, 18, 3),
+    ("K", 19, 1, 4), ("Ca", 20, 2, 4), ("Sc", 21, 3, 4), ("Ti", 22, 4, 4), ("V", 23, 5, 4), ("Cr", 24, 6, 4), ("Mn", 25, 7, 4),
+    ("Fe", 26, 8, 4), ("Co", 27, 9, 4), ("Ni", 28, 10, 4), ("Cu", 29, 11, 4), ("Zn", 30, 12, 4),
+    ("Ga", 31, 13, 4), ("Ge", 32, 14, 4), ("As", 33, 15, 4), ("Se", 34, 16, 4), ("Br", 35, 17, 4), ("Kr", 36, 18, 4),
+    ("Rb", 37, 1, 5), ("Sr", 38, 2, 5), ("Y", 39, 3, 5), ("Zr", 40, 4, 5), ("Nb", 41, 5, 5), ("Mo", 42, 6, 5), ("Tc", 43, 7, 5),
+    ("Ru", 44, 8, 5), ("Rh", 45, 9, 5), ("Pd", 46, 10, 5), ("Ag", 47, 11, 5), ("Cd", 48, 12, 5),
+    ("In", 49, 13, 5), ("Sn", 50, 14, 5), ("Sb", 51, 15, 5), ("Te", 52, 16, 5), ("I", 53, 17, 5), ("Xe", 54, 18, 5),
+    ("Cs", 55, 1, 6), ("Ba", 56, 2, 6), ("La", 57, 3, 9), ("Hf", 72, 4, 6), ("Ta", 73, 5, 6), ("W", 74, 6, 6), ("Re", 75, 7, 6),
+    ("Os", 76, 8, 6), ("Ir", 77, 9, 6), ("Pt", 78, 10, 6), ("Au", 79, 11, 6), ("Hg", 80, 12, 6),
+    ("Tl", 81, 13, 6), ("Pb", 82, 14, 6), ("Bi", 83, 15, 6), ("Po", 84, 16, 6), ("At", 85, 17, 6), ("Rn", 86, 18, 6),
+    ("Fr", 87, 1, 7), ("Ra", 88, 2, 7), ("Ac", 89, 3, 10), ("Rf", 104, 4, 7), ("Db", 105, 5, 7), ("Sg", 106, 6, 7), ("Bh", 107, 7, 7),
+    ("Hs", 108, 8, 7), ("Mt", 109, 9, 7), ("Ds", 110, 10, 7), ("Rg", 111, 11, 7), ("Cn", 112, 12, 7),
+    ("Nh", 113, 13, 7), ("Fl", 114, 14, 7), ("Mc", 115, 15, 7), ("Lv", 116, 16, 7), ("Ts", 117, 17, 7), ("Og", 118, 18, 7),
+    # 란탄족
+    ("Ce", 58, 4, 9), ("Pr", 59, 5, 9), ("Nd", 60, 6, 9), ("Pm", 61, 7, 9), ("Sm", 62, 8, 9), ("Eu", 63, 9, 9),
+    ("Gd", 64, 10, 9), ("Tb", 65, 11, 9), ("Dy", 66, 12, 9), ("Ho", 67, 13, 9), ("Er", 68, 14, 9), ("Tm", 69, 15, 9), ("Yb", 70, 16, 9), ("Lu", 71, 17, 9),
+    # 악티늄족
+    ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
+    ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
 ]
 
-columns = ["symbol", "name", "atomic number", "Group", "Period", "Atomic Mass",
-            "Electron Configuration", "Phase at STP", "Electronegativity",
-            "Melting Point", "Boiling Point", "Summary", "Type"]
-
+columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
-# 그룹 단순화: 금속 / 비금속 / 중금속
-metal_types = ["Alkali Metal", "Alkaline Earth Metal", "Transition Metal", "Post-Transition Metal", "Lanthanide", "Actinide"]
-non_metal_types = ["Nonmetal", "Noble Gas", "Halogen"]
+# 좌표 및 색상 지정
+df["x"] = df["Group"] - 1
+max_period = df["Period"].max()
+df["y"] = df["Period"].apply(lambda p: max_period - p)
 
-def simplify_type(t):
-    if t in metal_types:
-        return "금속"
-    elif t in non_metal_types:
-        return "비금속"
+# 색상 매핑 예시
+metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]
+nonmetals = ["H", "C", "N", "O", "F", "P", "S", "Cl", "Se", "Br", "I", "At", "Ts"]
+noblegases = ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]
+
+def assign_color(symbol):
+    if symbol in metals:
+        return "#FFD700"  # 금속 - 금색
+    elif symbol in nonmetals:
+        return "#90EE90"  # 비금속 - 연두색
+    elif symbol in noblegases:
+        return "#87CEFA"  # 비활성기체 - 하늘색
     else:
-        return "중금속"
+        return "#D3D3D3"  # 기타 - 회색
 
-df['type'] = df['Type'].apply(simplify_type)
+df["color"] = df["symbol"].apply(assign_color)
 
-# 색상 매핑
-color_map = {
-    "금속": "#FFD700",
-    "비금속": "#87CEFA",
-    "중금속": "#D3D3D3"
-}
-df['color'] = df['type'].map(color_map)
+# Streamlit 페이지 설정
+st.set_page_config(page_title="ChemPlay - 주기율표 배치", layout="wide")
+st.title("🧪 ChemPlay: 전체 주기율표 배치")
 
-# 박스형 UI 출력
-st.set_page_config(page_title="ChemPlay - 주기율표 박스형", layout="wide")
-st.title("🧪 ChemPlay: 전체 주기율표 (박스형)")
+# 범례 출력
+with st.expander("🧾 색상 범례 보기"):
+    st.markdown("""
+    <div style='display:flex; gap:1rem;'>
+        <div style='background-color:#FFD700; padding:5px 10px; border-radius:5px;'>금속</div>
+        <div style='background-color:#90EE90; padding:5px 10px; border-radius:5px;'>비금속</div>
+        <div style='background-color:#87CEFA; padding:5px 10px; border-radius:5px;'>비활성기체</div>
+        <div style='background-color:#D3D3D3; padding:5px 10px; border-radius:5px;'>기타</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# 좌표 계산
-df['x'] = df['Group'] - 1
-max_period = df['Period'].max()
-df['y'] = df['Period'].apply(lambda p: max_period - p)
-
-# 주기(행) 기준 출력
-y_levels = sorted(df['y'].unique())
+# UI 출력
+y_levels = sorted(df["y"].unique())
 for y in y_levels:
-    row = df[df['y'] == y].sort_values("x")
+    row = df[df["y"] == y].sort_values("x")
     cols = st.columns(18)
     for _, el in row.iterrows():
-        with cols[int(el['x'])]:
+        with cols[int(el["x"])]:
             if st.button(f"{el['symbol']}", key=f"btn_{el['atomic number']}"):
                 st.session_state["selected_element"] = el.to_dict()
             st.markdown(f"""
-                <div style='text-align:center; background-color:{el['color']}; padding:8px; border-radius:8px;'>
-                    <strong>{el['symbol']}</strong><br>
-                    <small>{int(el['atomic number'])}</small>
-                </div>
+                <style>
+                div[data-testid="element-container"] > div:has(button[data-testid="baseButton-module"])[data-testid="stButton"] {{
+                    background-color: {el['color']} !important;
+                    border-radius: 6px;
+                    padding: 10px;
+                    text-align: center;
+                    color: black;
+                    font-weight: bold;
+                }}
+                </style>
             """, unsafe_allow_html=True)
 
-# 선택한 원소 정보 표시
+# 클릭한 원소 정보
 if "selected_element" in st.session_state:
     el = st.session_state["selected_element"]
-    st.markdown("""
+    st.markdown(f"""
     ---
     ### 🔍 선택한 원소 정보
-    <div style='font-size:28px; font-weight:bold; text-align:center;'>
-        <div style='display:inline-block; line-height:0.9;'>
-            <sup style='font-size:16px;'>{A}</sup><br>
-            <span style='font-size:48px;'>{symbol}</span><br>
-            <sub style='font-size:16px;'>{Z}</sub>
-        </div>
-    </div>
-    <br>
-    """.format(
-        A=el.get("Atomic Mass", "A"),
-        Z=int(el["atomic number"]),
-        symbol=el["symbol"]
-    ), unsafe_allow_html=True)
-
-    st.write({
-        "이름": el["name"],
-        "원자번호": int(el["atomic number"]),
-        "족": int(el["Group"]),
-        "주기": int(el["Period"]),
-        "종류": el["type"],
-        "원자 질량": el.get("Atomic Mass", "정보 없음"),
-        "전자 배치": el.get("Electron Configuration", "정보 없음"),
-        "상온 상태": el.get("Phase at STP", "정보 없음"),
-        "전기 음성도": el.get("Electronegativity", "정보 없음"),
-        "녹는점 (K)": el.get("Melting Point", "정보 없음"),
-        "끓는점 (K)": el.get("Boiling Point", "정보 없음"),
-        "설명": el.get("Summary", "요약 정보 없음")
-    })
+    - 기호: {el['symbol']}
+    - 원자번호: {el['atomic number']}
+    - 족: {el['Group']}
+    - 주기: {el['Period']}
+    """)
