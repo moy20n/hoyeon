@@ -20,13 +20,12 @@ data = [
     ("Fr", 87, 1, 7), ("Ra", 88, 2, 7), ("Ac", 89, 3, 10), ("Rf", 104, 4, 7), ("Db", 105, 5, 7), ("Sg", 106, 6, 7), ("Bh", 107, 7, 7),
     ("Hs", 108, 8, 7), ("Mt", 109, 9, 7), ("Ds", 110, 10, 7), ("Rg", 111, 11, 7), ("Cn", 112, 12, 7),
     ("Nh", 113, 13, 7), ("Fl", 114, 14, 7), ("Mc", 115, 15, 7), ("Lv", 116, 16, 7), ("Ts", 117, 17, 7), ("Og", 118, 18, 7),
-    # 란탄족
     ("Ce", 58, 4, 9), ("Pr", 59, 5, 9), ("Nd", 60, 6, 9), ("Pm", 61, 7, 9), ("Sm", 62, 8, 9), ("Eu", 63, 9, 9),
     ("Gd", 64, 10, 9), ("Tb", 65, 11, 9), ("Dy", 66, 12, 9), ("Ho", 67, 13, 9), ("Er", 68, 14, 9), ("Tm", 69, 15, 9), ("Yb", 70, 16, 9), ("Lu", 71, 17, 9),
-    # 악티늄족
     ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
     ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
 ]
+
 columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
@@ -112,6 +111,5 @@ if st.session_state.get("show_popup", False):
             </div>
         """, unsafe_allow_html=True)
         st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
-    if st.button("❌ 팝업 닫기", key="close_popup"):
-        st.session_state["show_popup"] = False
+        if st.button("❌ 팝업 닫기", key="close_popup"):
             st.session_state["show_popup"] = False
