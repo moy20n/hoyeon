@@ -4,7 +4,7 @@ import pandas as pd
 # -------------------------------
 # 전체 주기율표 데이터 정의 (요약된 형태)
 # -------------------------------
-data =[
+data = [
     ("H", 1, 1, 1), ("He", 2, 18, 1),
     ("Li", 3, 1, 2), ("Be", 4, 2, 2), ("B", 5, 13, 2), ("C", 6, 14, 2), ("N", 7, 15, 2), ("O", 8, 16, 2), ("F", 9, 17, 2), ("Ne", 10, 18, 2),
     ("Na", 11, 1, 3), ("Mg", 12, 2, 3), ("Al", 13, 13, 3), ("Si", 14, 14, 3), ("P", 15, 15, 3), ("S", 16, 16, 3), ("Cl", 17, 17, 3), ("Ar", 18, 18, 3),
@@ -27,7 +27,6 @@ data =[
     ("Th", 90, 4, 10), ("Pa", 91, 5, 10), ("U", 92, 6, 10), ("Np", 93, 7, 10), ("Pu", 94, 8, 10), ("Am", 95, 9, 10),
     ("Cm", 96, 10, 10), ("Bk", 97, 11, 10), ("Cf", 98, 12, 10), ("Es", 99, 13, 10), ("Fm", 100, 14, 10), ("Md", 101, 15, 10), ("No", 102, 16, 10), ("Lr", 103, 17, 10)
 ]
-
 columns = ["symbol", "atomic number", "Group", "Period"]
 df = pd.DataFrame(data, columns=columns)
 
@@ -100,9 +99,11 @@ if st.session_state.get("show_popup", False):
     with st.container():
         st.markdown(f"""
             <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-    <div style='text-align:right;'><button onclick="window.location.reload()" style='background:none; border:none; font-size:20px; cursor:pointer;'>❌</button></div>
-                <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-                <ul style='list-style:none; padding:0; font-size:16px;'>
+    <div style='text-align:right;'>
+        <span style='font-size:18px; font-weight:bold;'>❌</span>
+    </div>
+    <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+    <ul style='list-style:none; padding:0; font-size:16px;'>
                     <li><strong>기호:</strong> {el.get('symbol')}</li>
                     <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
                     <li><strong>족:</strong> {el.get('Group')}</li>
@@ -111,5 +112,6 @@ if st.session_state.get("show_popup", False):
             </div>
         """, unsafe_allow_html=True)
         st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
-        if st.button("❌ 팝업 닫기", key="close_popup"):
+    if st.button("❌ 팝업 닫기", key="close_popup"):
+        st.session_state["show_popup"] = False
             st.session_state["show_popup"] = False
