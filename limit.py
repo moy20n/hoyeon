@@ -78,7 +78,7 @@ if "username" not in st.session_state or "password" not in st.session_state or "
 
 # ───── (4) 로그아웃 버튼 및 메인앱 ─────
 with st.sidebar:
-    st.markdown("---")
+    
     if st.button("로그아웃"):
         logout()
         st.stop()
