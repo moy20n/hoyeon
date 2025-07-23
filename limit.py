@@ -33,7 +33,7 @@ df = pd.DataFrame(data, columns=columns)
 df["x"] = df["Group"] - 1
 df["y"] = df["Period"] - 1
 
-metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]  # 예시
+metals = ["Li", "Be", "Na", "Mg", "Al", "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]  # 예시
 nonmetals = ["H", "C", "N", "O", "F", "P", "S", "Se", "Cl", "Br", "I"]
 noblegases = ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]
 
@@ -101,18 +101,17 @@ if st.session_state.get("show_popup", False):
             if st.button("❌", key="popup_close_inline"):
                 st.session_state["show_popup"] = False
         with col1:
-        st.markdown(f"""
-            <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
-    
-    <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
-    <ul style='list-style:none; padding:0; font-size:16px;'>
-                    <li><strong>기호:</strong> {el.get('symbol')}</li>
-                    <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
-                    <li><strong>족:</strong> {el.get('Group')}</li>
-                    <li><strong>주기:</strong> {el.get('Period')}</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
+                        st.markdown(f"""
+                <div style='position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border:2px solid #ccc; border-radius:10px; z-index:1000; box-shadow:0 0 20px rgba(0,0,0,0.3); width:300px;'>
+        <h4 style='text-align:center;'>🔍 선택한 원소 정보</h4>
+        <ul style='list-style:none; padding:0; font-size:16px;'>
+            <li><strong>기호:</strong> {el.get('symbol')}</li>
+            <li><strong>원자번호:</strong> {el.get('atomic number')}</li>
+            <li><strong>족:</strong> {el.get('Group')}</li>
+            <li><strong>주기:</strong> {el.get('Period')}</li>
+        </ul>
+    </div>
+            """, unsafe_allow_html=True)
         st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
         if st.button("❌ 팝업 닫기", key="close_popup"):
             st.session_state["show_popup"] = False
