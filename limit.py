@@ -10,7 +10,7 @@ if "logged_out" in st.session_state and st.session_state["logged_out"]:
     if st.button("로그인 화면으로 돌아가기"):
         del st.session_state["logged_out"]
         st.experimental_rerun()
-    st.stop()
+   
 
 # ───── (2) 안전 로그아웃 함수 ─────
 def logout():
