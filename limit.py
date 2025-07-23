@@ -4,17 +4,21 @@ import os
 import json
 import hashlib
 
-# ───── 로그아웃 플래그 확인 후 즉시 앱 중단(에러 예방) ─────
-if "logout" in st.session_state and st.session_state["logout"]:
+# ───── (1) 로그아웃 플래그 체크 후 세션 비우고 즉시 코드 정지 ─────
+if st.session_state.get("logout", False):
     for k in list(st.session_state.keys()):
         del st.session_state[k]
     st.stop()
 
-# ───── 비밀번호 해시 함수 ─────
+# ───── (2) 로그아웃 함수: session_state 삭제하지 않고 플래그만! ─────
+def logout():
+    st.session_state["logout"] = True
+    st.experimental_rerun()
+
+# ───── (3) 나머지 함수들 ─────
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# ───── 비밀번호 힌트 저장 및 로드 ─────
 def get_hint_path(user_hash):
     return os.path.join("diary_data", user_hash, ".hint")
 
@@ -31,12 +35,7 @@ def load_hint(user_hash):
             return f.read()
     return None
 
-# ───── 안전한 로그아웃 함수 ─────
-def logout():
-    st.session_state["logout"] = True
-    st.experimental_rerun()
-
-# ───── 사용자 인증 및 폴더 관리 ─────
+# ───── (4) 인증 및 힌트, 로그인 폼 ─────
 if "username" not in st.session_state or "password" not in st.session_state or "user_hash" not in st.session_state:
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
@@ -79,7 +78,7 @@ if "username" not in st.session_state or "password" not in st.session_state or "
 USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
 os.makedirs(USER_FOLDER, exist_ok=True)
 
-# ───── 로그아웃 버튼 ─────
+# ───── (5) 로그아웃 버튼 ─────
 with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
@@ -87,7 +86,6 @@ with st.sidebar:
 
 st.title(f"📔 {st.session_state.username}의 일기장 🔐")
 
-# ───── 감정/날씨 데이터 ─────
 EMOTION_CATEGORIES = {
     "긍정적인 감정": {
         "😊 행복": "happy",
@@ -123,7 +121,6 @@ WEATHERS = {
     "🌩️ 천둥번개": "stormy"
 }
 
-# ───── 파일 경로/저장/불러오기/검색 함수 ─────
 def get_diary_path(date_str):
     return os.path.join(USER_FOLDER, f"{date_str}.json")
 
@@ -149,7 +146,6 @@ def search_diaries(keyword):
                     results.append((filename.replace(".json", ""), entry))
     return results
 
-# ───── UI & 기능 ─────
 menu = st.sidebar.selectbox("메뉴 선택", ["✍️ 일기 쓰기", "🔍 일기 검색", "📅 지난 일기 보기"])
 
 if menu == "✍️ 일기 쓰기":
@@ -157,12 +153,8 @@ if menu == "✍️ 일기 쓰기":
     selected_date = st.date_input("날짜 선택", date.today())
     date_str = selected_date.isoformat()
 
-    # 오늘 일기 불러오기(있으면)
     existing_entry = load_diary(date_str)
-
-    # 기존 값 세팅 (없으면 기본값)
     if existing_entry:
-        # 감정 카테고리/감정 코드 역추적
         default_emotion_category = None
         default_emotion_label = None
         for category, emotions in EMOTION_CATEGORIES.items():
@@ -185,7 +177,6 @@ if menu == "✍️ 일기 쓰기":
         default_weather_label = list(WEATHERS.keys())[0]
         default_text = ""
 
-    # 입력 폼
     emotion_category = st.selectbox(
         "감정 카테고리를 선택하세요",
         list(EMOTION_CATEGORIES.keys()),
