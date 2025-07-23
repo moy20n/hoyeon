@@ -4,18 +4,14 @@ import os
 import json
 import hashlib
 
-# ───── (1) 로그아웃 플래그 체크 후 세션 비우고 즉시 코드 정지 ─────
-if st.session_state.get("logout", False):
-    for k in list(st.session_state.keys()):
-        del st.session_state[k]
-    st.stop()
-
-# ───── (2) 로그아웃 함수: session_state 삭제하지 않고 플래그만! ─────
+# ───── (1) 안전 로그아웃 함수 (session_state 주요 키만 삭제) ─────
 def logout():
-    st.session_state["logout"] = True
+    for k in ["username", "password", "user_hash", "temp_user_hash"]:
+        if k in st.session_state:
+            del st.session_state[k]
     st.experimental_rerun()
 
-# ───── (3) 나머지 함수들 ─────
+# ───── (2) 인증 상태 확인(없으면 로그인/회원가입만 노출하고 st.stop()) ─────
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -35,7 +31,6 @@ def load_hint(user_hash):
             return f.read()
     return None
 
-# ───── (4) 인증 및 힌트, 로그인 폼 ─────
 if "username" not in st.session_state or "password" not in st.session_state or "user_hash" not in st.session_state:
     if "temp_user_hash" not in st.session_state:
         st.session_state.temp_user_hash = ""
@@ -53,7 +48,6 @@ if "username" not in st.session_state or "password" not in st.session_state or "
             hint = load_hint(st.session_state.temp_user_hash)
         if hint:
             st.info(f"비밀번호 힌트: {hint}")
-
         submitted = st.form_submit_button("입력 완료")
         if submitted:
             if name_input.strip() and password_input.strip():
@@ -62,7 +56,6 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 st.session_state.user_hash = f"{name_input.strip()}_{hash_password(password_input.strip())}"
             else:
                 st.warning("이름과 비밀번호를 모두 입력해주세요.")
-
     if st.session_state.temp_user_hash and not os.path.exists(os.path.join("diary_data", st.session_state.temp_user_hash)):
         with st.form("hint_form"):
             hint_input = st.text_input("비밀번호 힌트(선택):")
@@ -71,14 +64,12 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 os.makedirs(os.path.join("diary_data", st.session_state.temp_user_hash), exist_ok=True)
                 save_hint(st.session_state.temp_user_hash, hint_input)
                 st.success("힌트가 저장되었습니다. 이제 이름/비밀번호를 다시 입력해 로그인하세요.")
-
-if "username" not in st.session_state or "password" not in st.session_state or "user_hash" not in st.session_state:
     st.stop()
 
+# ───── (3) 메인 앱: 로그아웃 버튼, 일기장 기능 ─────
 USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
 os.makedirs(USER_FOLDER, exist_ok=True)
 
-# ───── (5) 로그아웃 버튼 ─────
 with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
