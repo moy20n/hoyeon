@@ -114,5 +114,5 @@ if st.session_state.get("show_popup", False):
             </div>
         """, unsafe_allow_html=True)
         st.markdown("""<br><br><br><br><br><br>""", unsafe_allow_html=True)
-        if st.button("❌ 팝업 닫기", key="close_popup"):
-            st.session_state["show_popup"] = False
+            if st.button("❌ 팝업 닫기", key="close_popup"):
+                st.session_state["show_popup"] = False
