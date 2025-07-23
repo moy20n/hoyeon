@@ -4,15 +4,24 @@ import os
 import json
 import hashlib
 
-# ───── 안전 로그아웃 함수 ─────
+# ───── (1) 로그아웃 안내 페이지 처리 ─────
+if "logged_out" in st.session_state and st.session_state["logged_out"]:
+    st.success("로그아웃 되었습니다.")
+    if st.button("로그인 화면으로 돌아가기"):
+        del st.session_state["logged_out"]
+        st.experimental_rerun()
+    st.stop()
+
+# ───── (2) 안전 로그아웃 함수 ─────
 def logout():
     for k in ["username", "password", "user_hash", "temp_user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
+    st.session_state["logged_out"] = True
     st.experimental_rerun()
-    return  # 🔥 rerun 이후 함수 즉시 종료
+    return
 
-# ───── (1) 인증 상태 확인(없으면 로그인/회원가입만 노출하고 st.stop()) ─────
+# ───── (3) 인증 상태 확인(없으면 로그인/회원가입만 노출 후 st.stop()) ─────
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -67,12 +76,12 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 st.success("힌트가 저장되었습니다. 이제 이름/비밀번호를 다시 입력해 로그인하세요.")
     st.stop()
 
-# ───── 로그아웃 버튼 및 완벽 실행 차단 ─────
+# ───── (4) 로그아웃 버튼 및 메인앱 ─────
 with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
         logout()
-        st.stop()  # 🔥 혹시 rerun이 즉시 안될 때 코드 실행 완전 차단
+        st.stop()
 
 st.title(f"📔 {st.session_state.username}의 일기장 🔐")
 
