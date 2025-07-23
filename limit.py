@@ -111,7 +111,7 @@ if (
         if st.button("로그아웃"):
             logout()
 
-    st.title(f"📔 {st.session_state.username}의 일기장 🔐")
+    st.title("☁𝓓𝓲𝓪𝓻𝔂☁")
 
     EMOTION_CATEGORIES = {
         "긍정적인 감정": {
@@ -178,7 +178,6 @@ if (
     def get_diary_path(date_str):
         return os.path.join(USER_FOLDER, f"{date_str}.json")
 
-    # (추천곡 정보도 저장하도록 수정)
     def save_diary(date_str, text, emotion_code, weather_code, song_artist, song_title):
         entry = {
             "text": text,
@@ -207,7 +206,6 @@ if (
                         results.append((filename.replace(".json", ""), entry))
         return results
 
-    # 메뉴에 "추천곡 리스트" 추가!
     menu = st.sidebar.selectbox(
         "메뉴 선택",
         ["✍️ 일기 쓰기", "🔍 일기 검색", "📅 지난 일기 보기", "🎵 추천곡 리스트"]
@@ -268,7 +266,6 @@ if (
 
         text = st.text_area("일기 내용 입력", value=default_text, height=300)
 
-        # --- 오늘의 추천곡 입력칸 (추가) ---
         st.markdown("#### 오늘의 추천곡")
         song_artist = st.text_input("가수 이름", value=default_song_artist)
         song_title = st.text_input("곡 제목", value=default_song_title)
@@ -301,7 +298,6 @@ if (
                     weather_icon = EMOJI_WEATHER.get(entry['weather'], "")
                     st.markdown(f"### {date_str}  {weather_icon} {emotion_icon}")
                     st.text_area("내용", entry["text"], height=300, disabled=True)
-                    # --- 추천곡도 같이 보여주기 ---
                     if entry.get("song_artist") or entry.get("song_title"):
                         st.markdown(
                             f"#### 🎵 오늘의 추천곡\n- 가수: {entry.get('song_artist','')}\n- 제목: {entry.get('song_title','')}"
@@ -323,7 +319,6 @@ if (
                     weather_icon = EMOJI_WEATHER.get(entry['weather'], "")
                     st.markdown(f"### 📅 {date_str} | 감정: {emotion_icon} | 날씨: {weather_icon}")
                     st.markdown(entry["text"])
-                    # --- 추천곡도 보여주기 ---
                     if entry.get("song_artist") or entry.get("song_title"):
                         st.markdown(
                             f"🎵 <b>{entry.get('song_artist','')}</b> - {entry.get('song_title','')}",
@@ -333,7 +328,6 @@ if (
             else:
                 st.warning("검색 결과가 없습니다.")
 
-    # --- 추천곡 리스트 기능 ---
     elif menu == "🎵 추천곡 리스트":
         st.header("🎵 추천곡 리스트 (날짜별 정리)")
         diary_files = sorted(os.listdir(USER_FOLDER))
@@ -342,7 +336,6 @@ if (
         found = False
         for date_str in diary_dates:
             entry = load_diary(date_str)
-            # 곡 정보가 있으면만 출력
             if entry and (entry.get("song_artist") or entry.get("song_title")):
                 found = True
                 st.markdown(f"**{date_str}**<br>가수: <b>{entry.get('song_artist','')}</b> | 곡명: <b>{entry.get('song_title','')}</b>", unsafe_allow_html=True)
