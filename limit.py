@@ -158,19 +158,64 @@ if menu == "✍️ 일기 쓰기":
     selected_date = st.date_input("날짜 선택", date.today())
     date_str = selected_date.isoformat()
 
-    emotion_category = st.selectbox("감정 카테고리를 선택하세요", list(EMOTION_CATEGORIES.keys()))
+    # 오늘 일기 불러오기(있으면)
+    existing_entry = load_diary(date_str)
+
+    # 기존 값 세팅 (없으면 기본값)
+    if existing_entry:
+        # 감정 카테고리/감정 코드 역추적
+        default_emotion_category = None
+        default_emotion_label = None
+        for category, emotions in EMOTION_CATEGORIES.items():
+            for label, code in emotions.items():
+                if code == existing_entry['emotion']:
+                    default_emotion_category = category
+                    default_emotion_label = label
+                    break
+            if default_emotion_category: break
+        default_weather_label = None
+        for label, code in WEATHERS.items():
+            if code == existing_entry['weather']:
+                default_weather_label = label
+                break
+        default_text = existing_entry["text"]
+    else:
+        default_emotion_category = list(EMOTION_CATEGORIES.keys())[0]
+        default_emotion_label = list(EMOTION_CATEGORIES[default_emotion_category].keys())[0]
+        default_weather_label = list(WEATHERS.keys())[0]
+        default_text = ""
+
+    # 입력 폼
+    emotion_category = st.selectbox(
+        "감정 카테고리를 선택하세요", 
+        list(EMOTION_CATEGORIES.keys()), 
+        index=list(EMOTION_CATEGORIES.keys()).index(default_emotion_category) if default_emotion_category else 0
+    )
     emotion_options = EMOTION_CATEGORIES[emotion_category]
-    emotion_label = st.selectbox("세부 감정을 선택하세요", list(emotion_options.keys()))
+    emotion_label = st.selectbox(
+        "세부 감정을 선택하세요", 
+        list(emotion_options.keys()), 
+        index=list(emotion_options.keys()).index(default_emotion_label) if default_emotion_label and emotion_label in emotion_options else 0
+    )
     emotion_code = emotion_options[emotion_label]
 
-    weather_label = st.selectbox("오늘의 날씨는?", list(WEATHERS.keys()))
+    weather_label = st.selectbox(
+        "오늘의 날씨는?", 
+        list(WEATHERS.keys()), 
+        index=list(WEATHERS.keys()).index(default_weather_label) if default_weather_label else 0
+    )
     weather_code = WEATHERS[weather_label]
 
-    text = st.text_area("일기 내용 입력", height=300)
+    text = st.text_area("일기 내용 입력", value=default_text, height=300)
 
+    # 저장 버튼
     if st.button("💾 저장하기"):
         save_diary(date_str, text, emotion_code, weather_code)
         st.success("일기가 저장되었습니다.")
+
+    # 이미 저장된 일기가 있다면 안내
+    if existing_entry:
+        st.info("이 날짜의 일기가 이미 저장되어 있습니다. 내용을 수정하면 덮어씌워집니다.")
 
 elif menu == "📅 지난 일기 보기":
     st.header("저장된 일기 보기")
