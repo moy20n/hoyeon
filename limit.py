@@ -64,7 +64,6 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 st.warning("이름과 비밀번호를 모두 입력해주세요.")
 
     # 회원가입(최초 등록) 모드일 때만 힌트 입력 받기
-    # user 폴더 없으면 힌트 입력창 띄움
     if st.session_state.temp_user_hash and not os.path.exists(os.path.join("diary_data", st.session_state.temp_user_hash)):
         with st.form("hint_form"):
             hint_input = st.text_input("비밀번호 힌트(선택):")
@@ -172,7 +171,8 @@ if menu == "✍️ 일기 쓰기":
                     default_emotion_category = category
                     default_emotion_label = label
                     break
-            if default_emotion_category: break
+            if default_emotion_category:
+                break
         default_weather_label = None
         for label, code in WEATHERS.items():
             if code == existing_entry['weather']:
@@ -187,33 +187,31 @@ if menu == "✍️ 일기 쓰기":
 
     # 입력 폼
     emotion_category = st.selectbox(
-        "감정 카테고리를 선택하세요", 
-        list(EMOTION_CATEGORIES.keys()), 
+        "감정 카테고리를 선택하세요",
+        list(EMOTION_CATEGORIES.keys()),
         index=list(EMOTION_CATEGORIES.keys()).index(default_emotion_category) if default_emotion_category else 0
     )
     emotion_options = EMOTION_CATEGORIES[emotion_category]
     emotion_label = st.selectbox(
-        "세부 감정을 선택하세요", 
-        list(emotion_options.keys()), 
-        index=list(emotion_options.keys()).index(default_emotion_label) if default_emotion_label and emotion_label in emotion_options else 0
+        "세부 감정을 선택하세요",
+        list(emotion_options.keys()),
+        index=list(emotion_options.keys()).index(default_emotion_label) if default_emotion_label and default_emotion_label in emotion_options else 0
     )
     emotion_code = emotion_options[emotion_label]
 
     weather_label = st.selectbox(
-        "오늘의 날씨는?", 
-        list(WEATHERS.keys()), 
+        "오늘의 날씨는?",
+        list(WEATHERS.keys()),
         index=list(WEATHERS.keys()).index(default_weather_label) if default_weather_label else 0
     )
     weather_code = WEATHERS[weather_label]
 
     text = st.text_area("일기 내용 입력", value=default_text, height=300)
 
-    # 저장 버튼
     if st.button("💾 저장하기"):
         save_diary(date_str, text, emotion_code, weather_code)
         st.success("일기가 저장되었습니다.")
 
-    # 이미 저장된 일기가 있다면 안내
     if existing_entry:
         st.info("이 날짜의 일기가 이미 저장되어 있습니다. 내용을 수정하면 덮어씌워집니다.")
 
