@@ -4,14 +4,15 @@ import os
 import json
 import hashlib
 
-# ───── (1) 안전 로그아웃 함수 (session_state 주요 키만 삭제) ─────
+# ───── 안전 로그아웃 함수 ─────
 def logout():
     for k in ["username", "password", "user_hash", "temp_user_hash"]:
         if k in st.session_state:
             del st.session_state[k]
     st.experimental_rerun()
+    return  # 🔥 rerun 이후 함수 즉시 종료
 
-# ───── (2) 인증 상태 확인(없으면 로그인/회원가입만 노출하고 st.stop()) ─────
+# ───── (1) 인증 상태 확인(없으면 로그인/회원가입만 노출하고 st.stop()) ─────
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -66,16 +67,17 @@ if "username" not in st.session_state or "password" not in st.session_state or "
                 st.success("힌트가 저장되었습니다. 이제 이름/비밀번호를 다시 입력해 로그인하세요.")
     st.stop()
 
-# ───── (3) 메인 앱: 로그아웃 버튼, 일기장 기능 ─────
-USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
-os.makedirs(USER_FOLDER, exist_ok=True)
-
+# ───── 로그아웃 버튼 및 완벽 실행 차단 ─────
 with st.sidebar:
     st.markdown("---")
     if st.button("로그아웃"):
         logout()
+        st.stop()  # 🔥 혹시 rerun이 즉시 안될 때 코드 실행 완전 차단
 
 st.title(f"📔 {st.session_state.username}의 일기장 🔐")
+
+USER_FOLDER = os.path.join("diary_data", st.session_state.user_hash)
+os.makedirs(USER_FOLDER, exist_ok=True)
 
 EMOTION_CATEGORIES = {
     "긍정적인 감정": {
